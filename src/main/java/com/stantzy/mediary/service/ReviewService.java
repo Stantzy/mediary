@@ -8,6 +8,7 @@ import com.stantzy.mediary.dto.response.ReviewResponse;
 import com.stantzy.mediary.mapper.ReviewMapper;
 import com.stantzy.mediary.repository.MediaRepository;
 import com.stantzy.mediary.repository.ReviewRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,11 @@ public class ReviewService {
 
     public ReviewResponse createReview(ReviewCreateRequest reviewCreateRequest) {
         Media media = mediaRepository.findById(reviewCreateRequest.getMediaId())
-            .orElseThrow();
+            .orElseThrow(
+                () -> new EntityNotFoundException(
+                    "Not found Media by id=" + reviewCreateRequest.getMediaId()
+                )
+            );
 
         Review reviewToCreate = ReviewMapper.toEntity(reviewCreateRequest);
         reviewToCreate.setMedia(media);
@@ -33,7 +38,12 @@ public class ReviewService {
     }
 
     public ReviewResponse getReviewById(Long id) {
-        Review review = reviewRepository.findById(id).orElseThrow();
+        Review review = reviewRepository.findById(id)
+            .orElseThrow(
+                () -> new EntityNotFoundException(
+                    "Not found Review by id=" + id
+                )
+            );
 
         return ReviewMapper.toResponse(review);
     }
@@ -54,9 +64,12 @@ public class ReviewService {
         Long id,
         ReviewUpdateRequest reviewUpdateRequest
     ) {
-        Review reviewToUpdate = reviewRepository
-            .findById(id)
-            .orElseThrow();
+        Review reviewToUpdate = reviewRepository.findById(id)
+            .orElseThrow(
+                () -> new EntityNotFoundException(
+                    "Not found Review by id=" + id
+                )
+            );
 
         if(reviewUpdateRequest.getRating() != null)
             reviewToUpdate.setRating(reviewUpdateRequest.getRating());
@@ -69,6 +82,9 @@ public class ReviewService {
     }
 
     public void deleteReviewById(Long id) {
+        if(!reviewRepository.existsById(id))
+            throw new EntityNotFoundException("Not found Review by id=" + id);
+
         reviewRepository.deleteById(id);
     }
 

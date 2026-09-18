@@ -4,6 +4,7 @@ import com.stantzy.mediary.dto.request.MediaCreateRequest;
 import com.stantzy.mediary.dto.request.MediaUpdateRequest;
 import com.stantzy.mediary.dto.response.MediaResponse;
 import com.stantzy.mediary.service.MediaService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,11 @@ public class MediaController {
     public ResponseEntity<MediaResponse> getMediaById(
         @PathVariable(name = "id") Long mediaId
     ) {
-        return ResponseEntity.ok(mediaService.getMediaById(mediaId));
+        try {
+            return ResponseEntity.ok(mediaService.getMediaById(mediaId));
+        } catch(EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping
@@ -43,8 +48,12 @@ public class MediaController {
     public ResponseEntity<Void> deleteMedia(
         @PathVariable(name = "id") Long mediaId
     ) {
-        mediaService.deleteMedia(mediaId);
-        return ResponseEntity.ok().build();
+        try {
+            mediaService.deleteMedia(mediaId);
+            return ResponseEntity.noContent().build();
+        } catch(EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
@@ -52,6 +61,10 @@ public class MediaController {
         @PathVariable("id") Long id,
         @RequestBody MediaUpdateRequest request
     ) {
-        return ResponseEntity.ok(mediaService.updateMedia(id, request));
+        try {
+            return ResponseEntity.ok(mediaService.updateMedia(id, request));
+        } catch(EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

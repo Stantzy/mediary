@@ -4,6 +4,8 @@ import com.stantzy.mediary.dto.request.ReviewCreateRequest;
 import com.stantzy.mediary.dto.request.ReviewUpdateRequest;
 import com.stantzy.mediary.dto.response.ReviewResponse;
 import com.stantzy.mediary.service.ReviewService;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +23,12 @@ public class ReviewController {
     public ResponseEntity<ReviewResponse> getReviewById(
         @PathVariable(name = "id") Long id
     ) {
-        ReviewResponse result = reviewService.getReviewById(id);
-        return ResponseEntity.ok(result);
+        try {
+            ReviewResponse result = reviewService.getReviewById(id);
+            return ResponseEntity.ok(result);
+        } catch(EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping
@@ -40,10 +46,14 @@ public class ReviewController {
     public ResponseEntity<ReviewResponse> createReview(
         @RequestBody ReviewCreateRequest request
     ) {
-        ReviewResponse result = reviewService.createReview(request);
-        URI location = URI.create("/api/reviews/" + result.getId());
+        try {
+            ReviewResponse result = reviewService.createReview(request);
+            URI location = URI.create("/api/reviews/" + result.getId());
 
-        return ResponseEntity.created(location).body(result);
+            return ResponseEntity.created(location).body(result);
+        } catch(EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
@@ -51,15 +61,23 @@ public class ReviewController {
         @PathVariable("id") Long id,
         @RequestBody ReviewUpdateRequest request
     ) {
-        ReviewResponse updatedReview = reviewService.updateReview(id, request);
-        return ResponseEntity.ok(updatedReview);
+        try {
+            ReviewResponse updatedReview = reviewService.updateReview(id, request);
+            return ResponseEntity.ok(updatedReview);
+        } catch(EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReview(
         @PathVariable(name = "id") Long id
     ) {
-        reviewService.deleteReviewById(id);
-        return ResponseEntity.noContent().build();
+        try {
+            reviewService.deleteReviewById(id);
+            return ResponseEntity.noContent().build();
+        } catch(EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

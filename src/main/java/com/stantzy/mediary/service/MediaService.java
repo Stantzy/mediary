@@ -6,6 +6,7 @@ import com.stantzy.mediary.dto.request.MediaUpdateRequest;
 import com.stantzy.mediary.dto.response.MediaResponse;
 import com.stantzy.mediary.mapper.MediaMapper;
 import com.stantzy.mediary.repository.MediaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,11 @@ public class MediaService {
 
     public MediaResponse getMediaById(Long mediaId) {
         Media media = mediaRepository.findById(mediaId)
-            .orElseThrow();
+            .orElseThrow(
+                () -> new EntityNotFoundException(
+                    "Not found Media by id=" + mediaId
+                )
+            );
 
         return MediaMapper.toResponse(media);
     }
@@ -48,6 +53,12 @@ public class MediaService {
     }
 
     public void deleteMedia(Long mediaId) {
+        if(!mediaRepository.existsById(mediaId)) {
+            throw new EntityNotFoundException(
+                "Not found Media by id=" + mediaId
+            );
+        }
+
         mediaRepository.deleteById(mediaId);
     }
 
@@ -56,7 +67,11 @@ public class MediaService {
         MediaUpdateRequest request
     ) {
         Media mediaToUpdate = mediaRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(
+                () -> new EntityNotFoundException(
+                    "Not found Media by id=" + id
+                )
+            );
 
         mediaToUpdate.setType(request.getType());
         mediaToUpdate.setTitle(request.getTitle());
