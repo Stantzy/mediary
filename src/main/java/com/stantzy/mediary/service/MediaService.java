@@ -4,6 +4,7 @@ import com.stantzy.mediary.domain.Media;
 import com.stantzy.mediary.dto.request.MediaCreateRequest;
 import com.stantzy.mediary.dto.request.MediaUpdateRequest;
 import com.stantzy.mediary.dto.response.MediaResponse;
+import com.stantzy.mediary.mapper.MediaMapper;
 import com.stantzy.mediary.repository.MediaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,7 @@ public class MediaService {
         Media media = mediaRepository.findById(mediaId)
             .orElseThrow();
 
-        return MediaResponse.builder()
-            .id(media.getId())
-            .title(media.getTitle())
-            .author(media.getAuthor())
-            .description(media.getDescription())
-            .type(media.getType())
-            .createdAt(media.getCreatedAt())
-            .build();
+        return MediaMapper.toResponse(media);
     }
 
     public List<MediaResponse> listAllMedia() {
@@ -35,15 +29,7 @@ public class MediaService {
         List<MediaResponse> mediaResponseList = new ArrayList<>();
 
         for(Media media : mediaList) {
-            MediaResponse mediaResponse = MediaResponse.builder()
-                .id(media.getId())
-                .title(media.getTitle())
-                .author(media.getAuthor())
-                .description(media.getDescription())
-                .type(media.getType())
-                .createdAt(media.getCreatedAt())
-                .build();
-
+            MediaResponse mediaResponse = MediaMapper.toResponse(media);
             mediaResponseList.add(mediaResponse);
         }
 
@@ -54,23 +40,11 @@ public class MediaService {
         Media mediaToCreate = initMediaFromCreateRequest(request);
         Media createdMedia = mediaRepository.save(mediaToCreate);
 
-        return MediaResponse.builder()
-            .id(createdMedia.getId())
-            .title(createdMedia.getTitle())
-            .author(createdMedia.getAuthor())
-            .description(createdMedia.getDescription())
-            .type(createdMedia.getType())
-            .createdAt(createdMedia.getCreatedAt())
-            .build();
+        return MediaMapper.toResponse(createdMedia);
     }
 
     private Media initMediaFromCreateRequest(MediaCreateRequest request) {
-        return Media.builder()
-            .title(request.getTitle())
-            .author(request.getAuthor())
-            .description(request.getDescription())
-            .type(request.getType())
-            .build();
+        return MediaMapper.toEntity(request);
     }
 
     public void deleteMedia(Long mediaId) {
@@ -88,13 +62,6 @@ public class MediaService {
 
         Media updatedMedia = mediaRepository.save(mediaToUpdate);
 
-        return MediaResponse.builder()
-            .id(updatedMedia.getId())
-            .title(updatedMedia.getTitle())
-            .author(updatedMedia.getAuthor())
-            .description(updatedMedia.getDescription())
-            .type(updatedMedia.getType())
-            .createdAt(updatedMedia.getCreatedAt())
-            .build();
+        return MediaMapper.toResponse(updatedMedia);
     }
 }
