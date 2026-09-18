@@ -13,10 +13,11 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
-    @GetMapping("/api/reviews/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ReviewResponse> getReviewById(
         @PathVariable(name = "id") Long id
     ) {
@@ -24,14 +25,19 @@ public class ReviewController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/api/reviews")
-    public ResponseEntity<List<ReviewResponse>> listReviews() {
-        List<ReviewResponse> reviews = reviewService.getAllReviews();
+    @GetMapping
+    public ResponseEntity<List<ReviewResponse>> listReviews(
+        @RequestParam(name = "mediaId", required = false) Long mediaId
+    ) {
+    List<ReviewResponse> reviews = (mediaId == null)
+        ? reviewService.getAllReviews()
+        : reviewService.getAllReviewsByMediaId(mediaId);
+
         return ResponseEntity.ok(reviews);
     }
 
-    @PostMapping("/api/reviews")
-    public ResponseEntity<ReviewResponse> ReviewCreateRequest(
+    @PostMapping
+    public ResponseEntity<ReviewResponse> createReview(
         @RequestBody ReviewCreateRequest request
     ) {
         ReviewResponse result = reviewService.createReview(request);
@@ -40,15 +46,16 @@ public class ReviewController {
         return ResponseEntity.created(location).body(result);
     }
 
-    @PutMapping("/api/reviews")
+    @PutMapping("/{id}")
     public ResponseEntity<ReviewResponse> updateReview(
+        @PathVariable("id") Long id,
         @RequestBody ReviewUpdateRequest request
     ) {
-        ReviewResponse updatedReview = reviewService.updateReview(request);
+        ReviewResponse updatedReview = reviewService.updateReview(id, request);
         return ResponseEntity.ok(updatedReview);
     }
 
-    @DeleteMapping("/api/reviews/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReview(
         @PathVariable(name = "id") Long id
     ) {

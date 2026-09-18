@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MediaUpdateRequest {
-    private Long id;
     private MediaType type;
     private String title;
     private String author;

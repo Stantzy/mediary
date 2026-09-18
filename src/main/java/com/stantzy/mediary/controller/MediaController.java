@@ -13,22 +13,23 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/media")
 public class MediaController {
     private final MediaService mediaService;
 
-    @GetMapping("/api/media/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<MediaResponse> getMediaById(
         @PathVariable(name = "id") Long mediaId
     ) {
         return ResponseEntity.ok(mediaService.getMediaById(mediaId));
     }
 
-    @GetMapping("/api/media")
+    @GetMapping
     public ResponseEntity<List<MediaResponse>> listAllMedia() {
         return ResponseEntity.ok(mediaService.listAllMedia());
     }
 
-    @PostMapping("/api/media")
+    @PostMapping
     public ResponseEntity<MediaResponse> createMedia(
         @RequestBody MediaCreateRequest request
     ) {
@@ -38,7 +39,7 @@ public class MediaController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @DeleteMapping("/api/media/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMedia(
         @PathVariable(name = "id") Long mediaId
     ) {
@@ -46,10 +47,11 @@ public class MediaController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/api/media")
+    @PutMapping("/{id}")
     public ResponseEntity<MediaResponse> updateMedia(
+        @PathVariable("id") Long id,
         @RequestBody MediaUpdateRequest request
     ) {
-        return ResponseEntity.ok(mediaService.updateMedia(request));
+        return ResponseEntity.ok(mediaService.updateMedia(id, request));
     }
 }

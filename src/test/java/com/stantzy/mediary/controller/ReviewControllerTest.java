@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -116,10 +117,10 @@ public class ReviewControllerTest {
         ReviewResponse response = buildReviewResponse(1, 1, 1);
         response.setText("Updated text");
 
-        when(reviewService.updateReview(any(ReviewUpdateRequest.class)))
+        when(reviewService.updateReview(eq(request.getId()), any(ReviewUpdateRequest.class)))
             .thenReturn(response);
 
-        mockMvc.perform(put("/api/reviews")
+        mockMvc.perform(put("/api/reviews/{id}", request.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
             )
@@ -132,7 +133,7 @@ public class ReviewControllerTest {
 
         ArgumentCaptor<ReviewUpdateRequest> captor =
             ArgumentCaptor.forClass(ReviewUpdateRequest.class);
-        verify(reviewService).updateReview(captor.capture());
+        verify(reviewService).updateReview(eq(request.getId()), captor.capture());
 
         ReviewUpdateRequest capturedRequest = captor.getValue();
         assertThat(capturedRequest.getId()).isEqualTo(request.getId());

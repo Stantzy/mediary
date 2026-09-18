@@ -51,8 +51,11 @@ public class MediaService {
         mediaRepository.deleteById(mediaId);
     }
 
-    public MediaResponse updateMedia(MediaUpdateRequest request) {
-        Media mediaToUpdate = mediaRepository.findById(request.getId())
+    public MediaResponse updateMedia(
+        Long id,
+        MediaUpdateRequest request
+    ) {
+        Media mediaToUpdate = mediaRepository.findById(id)
             .orElseThrow();
 
         mediaToUpdate.setType(request.getType());

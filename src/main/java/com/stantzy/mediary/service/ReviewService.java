@@ -50,9 +50,12 @@ public class ReviewService {
         return reviewResponseList;
     }
 
-    public ReviewResponse updateReview(ReviewUpdateRequest reviewUpdateRequest) {
+    public ReviewResponse updateReview(
+        Long id,
+        ReviewUpdateRequest reviewUpdateRequest
+    ) {
         Review reviewToUpdate = reviewRepository
-            .findById(reviewUpdateRequest.getId())
+            .findById(id)
             .orElseThrow();
 
         if(reviewUpdateRequest.getRating() != null)
@@ -67,5 +70,12 @@ public class ReviewService {
 
     public void deleteReviewById(Long id) {
         reviewRepository.deleteById(id);
+    }
+
+    public List<ReviewResponse> getAllReviewsByMediaId(Long mediaId) {
+        List<Review> reviews = reviewRepository.findAllByMediaId(mediaId);
+        return reviews.stream()
+            .map(ReviewMapper::toResponse)
+            .toList();
     }
 }
