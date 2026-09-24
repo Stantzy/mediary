@@ -3,8 +3,8 @@ package com.stantzy.mediary.controller;
 import com.stantzy.mediary.dto.request.MediaCreateRequest;
 import com.stantzy.mediary.dto.request.MediaUpdateRequest;
 import com.stantzy.mediary.dto.response.MediaResponse;
+import com.stantzy.mediary.utils.ResponseWrapper;
 import com.stantzy.mediary.service.MediaService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +22,14 @@ public class MediaController {
     public ResponseEntity<MediaResponse> getMediaById(
         @PathVariable(name = "id") Long mediaId
     ) {
-        try {
-            return ResponseEntity.ok(mediaService.getMediaById(mediaId));
-        } catch(EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+//        try {
+//            return ResponseEntity.ok(mediaService.getMediaById(mediaId));
+//        } catch(EntityNotFoundException e) {
+//            return ResponseEntity.notFound().build();
+//        }
+        return ResponseWrapper.handleOk(
+            () -> mediaService.getMediaById(mediaId)
+        );
     }
 
     @GetMapping
@@ -48,12 +51,15 @@ public class MediaController {
     public ResponseEntity<Void> deleteMedia(
         @PathVariable(name = "id") Long mediaId
     ) {
-        try {
-            mediaService.deleteMedia(mediaId);
-            return ResponseEntity.noContent().build();
-        } catch(EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+//        try {
+//            mediaService.deleteMedia(mediaId);
+//            return ResponseEntity.noContent().build();
+//        } catch(EntityNotFoundException e) {
+//            return ResponseEntity.notFound().build();
+//        }
+        return ResponseWrapper.handleNoContent(
+            () -> mediaService.deleteMedia(mediaId)
+        );
     }
 
     @PutMapping("/{id}")
@@ -61,10 +67,13 @@ public class MediaController {
         @PathVariable("id") Long id,
         @RequestBody MediaUpdateRequest request
     ) {
-        try {
-            return ResponseEntity.ok(mediaService.updateMedia(id, request));
-        } catch(EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+//        try {
+//            return ResponseEntity.ok(mediaService.updateMedia(id, request));
+//        } catch(EntityNotFoundException e) {
+//            return ResponseEntity.notFound().build();
+//        }
+        return ResponseWrapper.handleOk(
+            () -> mediaService.updateMedia(id, request)
+        );
     }
 }

@@ -3,14 +3,13 @@ package com.stantzy.mediary.controller;
 import com.stantzy.mediary.dto.request.ReviewCreateRequest;
 import com.stantzy.mediary.dto.request.ReviewUpdateRequest;
 import com.stantzy.mediary.dto.response.ReviewResponse;
+import com.stantzy.mediary.utils.ResponseWrapper;
 import com.stantzy.mediary.service.ReviewService;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,12 +22,15 @@ public class ReviewController {
     public ResponseEntity<ReviewResponse> getReviewById(
         @PathVariable(name = "id") Long id
     ) {
-        try {
-            ReviewResponse result = reviewService.getReviewById(id);
-            return ResponseEntity.ok(result);
-        } catch(EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+//        try {
+//            ReviewResponse result = reviewService.getReviewById(id);
+//            return ResponseEntity.ok(result);
+//        } catch(EntityNotFoundException e) {
+//            return ResponseEntity.notFound().build();
+//        }
+        return ResponseWrapper.handleOk(
+            () -> reviewService.getReviewById(id)
+        );
     }
 
     @GetMapping
@@ -46,14 +48,18 @@ public class ReviewController {
     public ResponseEntity<ReviewResponse> createReview(
         @RequestBody ReviewCreateRequest request
     ) {
-        try {
-            ReviewResponse result = reviewService.createReview(request);
-            URI location = URI.create("/api/reviews/" + result.getId());
+//        try {
+//            ReviewResponse result = reviewService.createReview(request);
+//            URI location = URI.create("/api/reviews/" + result.getId());
+//
+//            return ResponseEntity.created(location).body(result);
+//        } catch(EntityNotFoundException e) {
+//            return ResponseEntity.notFound().build();
+//        }
 
-            return ResponseEntity.created(location).body(result);
-        } catch(EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseWrapper.handleCreated(
+            () -> reviewService.createReview(request)
+        );
     }
 
     @PutMapping("/{id}")
