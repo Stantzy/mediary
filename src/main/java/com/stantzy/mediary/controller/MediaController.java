@@ -3,7 +3,6 @@ package com.stantzy.mediary.controller;
 import com.stantzy.mediary.dto.request.MediaCreateRequest;
 import com.stantzy.mediary.dto.request.MediaUpdateRequest;
 import com.stantzy.mediary.dto.response.MediaResponse;
-import com.stantzy.mediary.utils.ResponseWrapper;
 import com.stantzy.mediary.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +21,8 @@ public class MediaController {
     public ResponseEntity<MediaResponse> getMediaById(
         @PathVariable(name = "id") Long mediaId
     ) {
-//        try {
-//            return ResponseEntity.ok(mediaService.getMediaById(mediaId));
-//        } catch(EntityNotFoundException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-        return ResponseWrapper.handleOk(
-            () -> mediaService.getMediaById(mediaId)
-        );
+        MediaResponse result = mediaService.getMediaById(mediaId);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping
@@ -41,25 +34,18 @@ public class MediaController {
     public ResponseEntity<MediaResponse> createMedia(
         @RequestBody MediaCreateRequest request
     ) {
-        MediaResponse response = mediaService.createMedia(request);
-        URI location = URI.create("/api/media/" + response.getId());
+        MediaResponse result = mediaService.createMedia(request);
+        URI location = URI.create("/api/media/" + result.getId());
 
-        return ResponseEntity.created(location).body(response);
+        return ResponseEntity.created(location).body(result);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMedia(
         @PathVariable(name = "id") Long mediaId
     ) {
-//        try {
-//            mediaService.deleteMedia(mediaId);
-//            return ResponseEntity.noContent().build();
-//        } catch(EntityNotFoundException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-        return ResponseWrapper.handleNoContent(
-            () -> mediaService.deleteMedia(mediaId)
-        );
+        mediaService.deleteMedia(mediaId);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
@@ -67,13 +53,7 @@ public class MediaController {
         @PathVariable("id") Long id,
         @RequestBody MediaUpdateRequest request
     ) {
-//        try {
-//            return ResponseEntity.ok(mediaService.updateMedia(id, request));
-//        } catch(EntityNotFoundException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-        return ResponseWrapper.handleOk(
-            () -> mediaService.updateMedia(id, request)
-        );
+        MediaResponse result = mediaService.updateMedia(id, request);
+        return ResponseEntity.ok(result);
     }
 }
