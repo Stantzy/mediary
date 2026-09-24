@@ -5,10 +5,11 @@ import com.stantzy.mediary.domain.Review;
 import com.stantzy.mediary.dto.request.ReviewCreateRequest;
 import com.stantzy.mediary.dto.request.ReviewUpdateRequest;
 import com.stantzy.mediary.dto.response.ReviewResponse;
+import com.stantzy.mediary.exception.MediaNotFoundException;
+import com.stantzy.mediary.exception.ReviewNotFoundException;
 import com.stantzy.mediary.mapper.ReviewMapper;
 import com.stantzy.mediary.repository.MediaRepository;
 import com.stantzy.mediary.repository.ReviewRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +23,8 @@ public class ReviewService {
     private final MediaRepository mediaRepository;
 
     public ReviewResponse createReview(ReviewCreateRequest reviewCreateRequest) {
-        Media media = mediaRepository.findById(reviewCreateRequest.getMediaId())
-            .orElseThrow(
-                () -> new EntityNotFoundException(
-                    "Not found Media by id=" + reviewCreateRequest.getMediaId()
-                )
-            );
+        Long mediaId = reviewCreateRequest.getMediaId();
+        Media media = findMediaByIdOrThrow(mediaId);
 
         Review reviewToCreate = ReviewMapper.toEntity(reviewCreateRequest);
         reviewToCreate.setMedia(media);
@@ -38,13 +35,7 @@ public class ReviewService {
     }
 
     public ReviewResponse getReviewById(Long id) {
-        Review review = reviewRepository.findById(id)
-            .orElseThrow(
-                () -> new EntityNotFoundException(
-                    "Not found Review by id=" + id
-                )
-            );
-
+        Review review = findReviewByIdOrThrow(id);
         return ReviewMapper.toResponse(review);
     }
 
@@ -64,12 +55,7 @@ public class ReviewService {
         Long id,
         ReviewUpdateRequest reviewUpdateRequest
     ) {
-        Review reviewToUpdate = reviewRepository.findById(id)
-            .orElseThrow(
-                () -> new EntityNotFoundException(
-                    "Not found Review by id=" + id
-                )
-            );
+        Review reviewToUpdate = findReviewByIdOrThrow(id);
 
         if(reviewUpdateRequest.getRating() != null)
             reviewToUpdate.setRating(reviewUpdateRequest.getRating());
@@ -82,10 +68,8 @@ public class ReviewService {
     }
 
     public void deleteReviewById(Long id) {
-        if(!reviewRepository.existsById(id))
-            throw new EntityNotFoundException("Not found Review by id=" + id);
-
-        reviewRepository.deleteById(id);
+        Review reviewToDelete = findReviewByIdOrThrow(id);
+        reviewRepository.delete(reviewToDelete);
     }
 
     public List<ReviewResponse> getAllReviewsByMediaId(Long mediaId) {
@@ -93,5 +77,23 @@ public class ReviewService {
         return reviews.stream()
             .map(ReviewMapper::toResponse)
             .toList();
+    }
+
+    private Media findMediaByIdOrThrow(Long id) {
+        return mediaRepository.findById(id)
+            .orElseThrow(
+                () -> new MediaNotFoundException(
+                    "Not found Media by id=" + id
+                )
+            );
+    }
+
+    private Review findReviewByIdOrThrow(Long id) {
+        return reviewRepository.findById(id)
+            .orElseThrow(
+                () -> new ReviewNotFoundException(
+                    "Not found Review by id=" + id
+                )
+            );
     }
 }

@@ -4,9 +4,9 @@ import com.stantzy.mediary.domain.Media;
 import com.stantzy.mediary.dto.request.MediaCreateRequest;
 import com.stantzy.mediary.dto.request.MediaUpdateRequest;
 import com.stantzy.mediary.dto.response.MediaResponse;
+import com.stantzy.mediary.exception.MediaNotFoundException;
 import com.stantzy.mediary.mapper.MediaMapper;
 import com.stantzy.mediary.repository.MediaRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +19,7 @@ public class MediaService {
     private final MediaRepository mediaRepository;
 
     public MediaResponse getMediaById(Long mediaId) {
-        Media media = mediaRepository.findById(mediaId)
-            .orElseThrow(
-                () -> new EntityNotFoundException(
-                    "Not found Media by id=" + mediaId
-                )
-            );
-
+        Media media = findByIdOrThrow(mediaId);
         return MediaMapper.toResponse(media);
     }
 
@@ -42,36 +36,22 @@ public class MediaService {
     }
 
     public MediaResponse createMedia(MediaCreateRequest request) {
-        Media mediaToCreate = initMediaFromCreateRequest(request);
+        Media mediaToCreate = MediaMapper.toEntity(request);
         Media createdMedia = mediaRepository.save(mediaToCreate);
 
         return MediaMapper.toResponse(createdMedia);
     }
 
-    private Media initMediaFromCreateRequest(MediaCreateRequest request) {
-        return MediaMapper.toEntity(request);
-    }
-
     public void deleteMedia(Long mediaId) {
-        if(!mediaRepository.existsById(mediaId)) {
-            throw new EntityNotFoundException(
-                "Not found Media by id=" + mediaId
-            );
-        }
-
-        mediaRepository.deleteById(mediaId);
+        Media mediaToDelete = findByIdOrThrow(mediaId);
+        mediaRepository.delete(mediaToDelete);
     }
 
     public MediaResponse updateMedia(
         Long id,
         MediaUpdateRequest request
     ) {
-        Media mediaToUpdate = mediaRepository.findById(id)
-            .orElseThrow(
-                () -> new EntityNotFoundException(
-                    "Not found Media by id=" + id
-                )
-            );
+        Media mediaToUpdate = findByIdOrThrow(id);
 
         mediaToUpdate.setType(request.getType());
         mediaToUpdate.setTitle(request.getTitle());
@@ -81,5 +61,14 @@ public class MediaService {
         Media updatedMedia = mediaRepository.save(mediaToUpdate);
 
         return MediaMapper.toResponse(updatedMedia);
+    }
+
+    private Media findByIdOrThrow(Long id) {
+        return mediaRepository.findById(id)
+            .orElseThrow(
+                () -> new MediaNotFoundException(
+                    "Not found Media by id=" + id
+                )
+            );
     }
 }
