@@ -4,8 +4,8 @@ import com.stantzy.mediary.domain.MediaType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -15,7 +15,8 @@ public class MediaResponse {
     private String title;
     private String author;
     private String description;
-    private List<Long> reviewIds;
+    private BigDecimal averageRating;
+    private Long reviewCount;
     private LocalDateTime createdAt;
 
     public static Builder builder() {
@@ -28,7 +29,8 @@ public class MediaResponse {
         private String title;
         private String author;
         private String description;
-        private List<Long> reviewIds;
+        private BigDecimal averageRating;
+        private Long reviewCount;
         private LocalDateTime createdAt;
 
         public Builder id(Long id) {
@@ -56,8 +58,13 @@ public class MediaResponse {
             return this;
         }
 
-        public Builder reviewIds(List<Long> reviewIds) {
-            this.reviewIds = reviewIds;
+        public Builder averageRating(BigDecimal averageRating) {
+            this.averageRating = averageRating;
+            return this;
+        }
+
+        public Builder reviewCount(Long reviewCount) {
+            this.reviewCount = reviewCount;
             return this;
         }
 
@@ -74,7 +81,8 @@ public class MediaResponse {
             mediaResponse.setAuthor(author);
             mediaResponse.setType(type);
             mediaResponse.setDescription(description);
-            mediaResponse.setReviewIds(reviewIds);
+            mediaResponse.setAverageRating(averageRating);
+            mediaResponse.setReviewCount(reviewCount);
             mediaResponse.setCreatedAt(createdAt);
 
             return mediaResponse;

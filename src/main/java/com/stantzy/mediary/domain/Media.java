@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,6 +35,12 @@ public class Media {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Transient
+    private BigDecimal averageRating;
+
+    @Transient
+    private Long reviewCount;
+
     public static Builder builder() {
         return new Builder();
     }
@@ -45,6 +52,8 @@ public class Media {
         private String author;
         private String description;
         private List<Review> reviews;
+        private BigDecimal averageRating;
+        private Long reviewCount;
         private LocalDateTime createdAt;
 
         public Builder id(Long id) {
@@ -82,6 +91,16 @@ public class Media {
             return this;
         }
 
+        public Builder averageRating(BigDecimal averageRating) {
+            this.averageRating = averageRating;
+            return this;
+        }
+
+        public Builder reviewCounter(Long reviewCount) {
+            this.reviewCount = reviewCount;
+            return this;
+        }
+
         public Media build() {
             validateFields();
             applyDefaults();
@@ -94,6 +113,8 @@ public class Media {
             media.setType(this.type);
             media.setDescription(this.description);
             media.setReviews(this.reviews);
+            media.setAverageRating(this.averageRating);
+            media.setReviewCount(this.reviewCount);
             media.setCreatedAt(this.createdAt);
 
             return media;

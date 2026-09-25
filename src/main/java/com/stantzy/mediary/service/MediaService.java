@@ -7,9 +7,11 @@ import com.stantzy.mediary.dto.response.MediaResponse;
 import com.stantzy.mediary.exception.MediaNotFoundException;
 import com.stantzy.mediary.mapper.MediaMapper;
 import com.stantzy.mediary.repository.MediaRepository;
+import com.stantzy.mediary.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +19,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MediaService {
     private final MediaRepository mediaRepository;
+    private final ReviewRepository reviewRepository;
 
     public MediaResponse getMediaById(Long mediaId) {
         Media media = findByIdOrThrow(mediaId);
+        BigDecimal averageRating =
+            reviewRepository.findAverageRatingByMediaId(mediaId);
+        Long reviewCount = reviewRepository.countByMediaId(mediaId);
+
+        media.setAverageRating(
+            averageRating == null ? BigDecimal.ZERO : averageRating
+        );
+        media.setReviewCount(reviewCount);
+
         return MediaMapper.toResponse(media);
     }
 

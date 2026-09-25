@@ -23,6 +23,8 @@ public final class MediaMapper {
             .title(media.getTitle())
             .author(media.getAuthor())
             .description(media.getDescription())
+            .averageRating(media.getAverageRating())
+            .reviewCount(media.getReviewCount())
             .createdAt(media.getCreatedAt())
             .build();
     }
