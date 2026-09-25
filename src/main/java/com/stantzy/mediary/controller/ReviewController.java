@@ -4,14 +4,18 @@ import com.stantzy.mediary.dto.request.ReviewCreateRequest;
 import com.stantzy.mediary.dto.request.ReviewUpdateRequest;
 import com.stantzy.mediary.dto.response.ReviewResponse;
 import com.stantzy.mediary.service.ReviewService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
 public class ReviewController {
@@ -19,7 +23,7 @@ public class ReviewController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ReviewResponse> getReviewById(
-        @PathVariable(name = "id") Long id
+        @PathVariable(name = "id") @Positive Long id
     ) {
         ReviewResponse result = reviewService.getReviewById(id);
         return ResponseEntity.ok(result);
@@ -27,7 +31,7 @@ public class ReviewController {
 
     @GetMapping
     public ResponseEntity<List<ReviewResponse>> listReviews(
-        @RequestParam(name = "mediaId", required = false) Long mediaId
+        @RequestParam(name = "mediaId", required = false) @Positive Long mediaId
     ) {
         List<ReviewResponse> result = (mediaId == null)
             ? reviewService.getAllReviews()
@@ -38,7 +42,7 @@ public class ReviewController {
 
     @PostMapping
     public ResponseEntity<ReviewResponse> createReview(
-        @RequestBody ReviewCreateRequest request
+        @Valid @RequestBody ReviewCreateRequest request
     ) {
         ReviewResponse result = reviewService.createReview(request);
         URI location = URI.create("/api/reviews/" + result.getId());
@@ -48,8 +52,8 @@ public class ReviewController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ReviewResponse> updateReview(
-        @PathVariable("id") Long id,
-        @RequestBody ReviewUpdateRequest request
+        @PathVariable("id") @Positive Long id,
+        @Valid @RequestBody ReviewUpdateRequest request
     ) {
         ReviewResponse result = reviewService.updateReview(id, request);
         return ResponseEntity.ok(result);
@@ -57,7 +61,7 @@ public class ReviewController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReview(
-        @PathVariable(name = "id") Long id
+        @PathVariable(name = "id") @Positive Long id
     ) {
         reviewService.deleteReviewById(id);
         return ResponseEntity.noContent().build();

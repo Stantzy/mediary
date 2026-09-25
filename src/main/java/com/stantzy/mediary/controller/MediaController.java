@@ -4,14 +4,19 @@ import com.stantzy.mediary.dto.request.MediaCreateRequest;
 import com.stantzy.mediary.dto.request.MediaUpdateRequest;
 import com.stantzy.mediary.dto.response.MediaResponse;
 import com.stantzy.mediary.service.MediaService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/api/media")
 public class MediaController {
@@ -19,7 +24,7 @@ public class MediaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MediaResponse> getMediaById(
-        @PathVariable(name = "id") Long mediaId
+        @PathVariable(name = "id") @Positive Long mediaId
     ) {
         MediaResponse result = mediaService.getMediaById(mediaId);
         return ResponseEntity.ok(result);
@@ -32,7 +37,7 @@ public class MediaController {
 
     @PostMapping
     public ResponseEntity<MediaResponse> createMedia(
-        @RequestBody MediaCreateRequest request
+        @Valid @RequestBody MediaCreateRequest request
     ) {
         MediaResponse result = mediaService.createMedia(request);
         URI location = URI.create("/api/media/" + result.getId());
@@ -42,7 +47,7 @@ public class MediaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMedia(
-        @PathVariable(name = "id") Long mediaId
+        @PathVariable(name = "id") @Positive Long mediaId
     ) {
         mediaService.deleteMedia(mediaId);
         return ResponseEntity.noContent().build();
@@ -50,8 +55,8 @@ public class MediaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MediaResponse> updateMedia(
-        @PathVariable("id") Long id,
-        @RequestBody MediaUpdateRequest request
+        @PathVariable("id") @Positive Long id,
+        @Valid @RequestBody MediaUpdateRequest request
     ) {
         MediaResponse result = mediaService.updateMedia(id, request);
         return ResponseEntity.ok(result);

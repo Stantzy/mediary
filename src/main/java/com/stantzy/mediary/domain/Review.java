@@ -16,7 +16,7 @@ public class Review {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "media_id", referencedColumnName = "id")
+    @JoinColumn(name = "media_id", referencedColumnName = "id", nullable = false)
     private Media media;
 
     @Column(name = "rating", nullable = false)

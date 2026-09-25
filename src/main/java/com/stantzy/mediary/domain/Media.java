@@ -19,11 +19,13 @@ public class Media {
     @Enumerated(value = EnumType.STRING)
     private MediaType type;
 
-    @Column(unique = true)
+    @Column(name = "title", nullable = false, unique = true)
     private String title;
 
+    @Column(name = "author")
     private String author;
 
+    @Column(name = "description")
     private String description;
 
     @OneToMany(mappedBy = "media")

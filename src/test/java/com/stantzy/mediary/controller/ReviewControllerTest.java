@@ -112,15 +112,16 @@ public class ReviewControllerTest {
 
     @Test
     void shouldUpdateReview() throws Exception {
+        Long reviewId = 1L;
         ReviewUpdateRequest request =
-            new ReviewUpdateRequest(1L, 1, "Updated text");
+            new ReviewUpdateRequest(1, "Updated text");
         ReviewResponse response = buildReviewResponse(1, 1, 1);
         response.setText("Updated text");
 
-        when(reviewService.updateReview(eq(request.getId()), any(ReviewUpdateRequest.class)))
+        when(reviewService.updateReview(eq(reviewId), any(ReviewUpdateRequest.class)))
             .thenReturn(response);
 
-        mockMvc.perform(put("/api/reviews/{id}", request.getId())
+        mockMvc.perform(put("/api/reviews/{id}", reviewId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
             )
@@ -133,10 +134,9 @@ public class ReviewControllerTest {
 
         ArgumentCaptor<ReviewUpdateRequest> captor =
             ArgumentCaptor.forClass(ReviewUpdateRequest.class);
-        verify(reviewService).updateReview(eq(request.getId()), captor.capture());
+        verify(reviewService).updateReview(eq(reviewId), captor.capture());
 
         ReviewUpdateRequest capturedRequest = captor.getValue();
-        assertThat(capturedRequest.getId()).isEqualTo(request.getId());
         assertThat(capturedRequest.getRating()).isEqualTo(request.getRating());
         assertThat(capturedRequest.getText()).isEqualTo(request.getText());
     }
