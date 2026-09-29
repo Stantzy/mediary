@@ -9,6 +9,8 @@ import com.stantzy.mediary.mapper.MediaMapper;
 import com.stantzy.mediary.repository.MediaRepository;
 import com.stantzy.mediary.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,6 +20,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MediaService {
+    private static final Logger logger =
+        LoggerFactory.getLogger(MediaService.class);
+
     private final MediaRepository mediaRepository;
     private final ReviewRepository reviewRepository;
 
@@ -51,12 +56,19 @@ public class MediaService {
         Media mediaToCreate = MediaMapper.toEntity(request);
         Media createdMedia = mediaRepository.save(mediaToCreate);
 
+        logger.info("Media created: id={}", createdMedia.getId());
+
         return MediaMapper.toResponse(createdMedia);
     }
 
     public void deleteMedia(Long mediaId) {
         Media mediaToDelete = findByIdOrThrow(mediaId);
         mediaRepository.delete(mediaToDelete);
+        logger.info(
+            "Media deleted: id={}, title={}",
+            mediaId,
+            mediaToDelete.getTitle()
+        );
     }
 
     public MediaResponse updateMedia(
@@ -64,6 +76,7 @@ public class MediaService {
         MediaUpdateRequest request
     ) {
         Media mediaToUpdate = findByIdOrThrow(id);
+        String oldTitle = mediaToUpdate.getTitle();
 
         mediaToUpdate.setType(request.getType());
         mediaToUpdate.setTitle(request.getTitle());
@@ -72,6 +85,13 @@ public class MediaService {
 
         Media updatedMedia = mediaRepository.save(mediaToUpdate);
 
+        logger.info(
+            "Media updated: id={}, old title={}, new title={}",
+            updatedMedia.getId(),
+            oldTitle,
+            updatedMedia.getTitle()
+        );
+
         return MediaMapper.toResponse(updatedMedia);
     }
 
@@ -79,6 +99,7 @@ public class MediaService {
         return mediaRepository.findById(id)
             .orElseThrow(
                 () -> new MediaNotFoundException(
+                    id,
                     "Not found Media by id=" + id
                 )
             );

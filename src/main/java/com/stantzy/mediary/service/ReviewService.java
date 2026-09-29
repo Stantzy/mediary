@@ -11,6 +11,8 @@ import com.stantzy.mediary.mapper.ReviewMapper;
 import com.stantzy.mediary.repository.MediaRepository;
 import com.stantzy.mediary.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +21,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
+    private static final Logger logger =
+        LoggerFactory.getLogger(ReviewService.class);
+
     private final ReviewRepository reviewRepository;
     private final MediaRepository mediaRepository;
 
@@ -30,6 +35,12 @@ public class ReviewService {
         reviewToCreate.setMedia(media);
 
         Review savedReview = reviewRepository.save(reviewToCreate);
+
+        logger.info(
+            "Review created: id={}, mediaId={}",
+            savedReview.getId(),
+            mediaId
+        );
 
         return ReviewMapper.toResponse(savedReview);
     }
@@ -64,12 +75,17 @@ public class ReviewService {
 
         Review updatedReview = reviewRepository.save(reviewToUpdate);
 
+        logger.info("Review updated: id={}", updatedReview.getId());
+
         return ReviewMapper.toResponse(updatedReview);
     }
 
     public void deleteReviewById(Long id) {
         Review reviewToDelete = findReviewByIdOrThrow(id);
+        Long mediaId = reviewToDelete.getMedia().getId();
+
         reviewRepository.delete(reviewToDelete);
+        logger.info("Review deleted: id={}, mediaId={}", id, mediaId);
     }
 
     public List<ReviewResponse> getAllReviewsByMediaId(Long mediaId) {
@@ -83,6 +99,7 @@ public class ReviewService {
         return mediaRepository.findById(id)
             .orElseThrow(
                 () -> new MediaNotFoundException(
+                    id,
                     "Not found Media by id=" + id
                 )
             );
@@ -92,6 +109,7 @@ public class ReviewService {
         return reviewRepository.findById(id)
             .orElseThrow(
                 () -> new ReviewNotFoundException(
+                    id,
                     "Not found Review by id=" + id
                 )
             );

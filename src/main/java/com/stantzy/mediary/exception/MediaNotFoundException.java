@@ -1,7 +1,7 @@
 package com.stantzy.mediary.exception;
 
 public class MediaNotFoundException extends GenericEntityNotFoundException {
-    public MediaNotFoundException(String message) {
-        super(message);
+    public MediaNotFoundException(Long mediaId, String message) {
+        super("Media", mediaId, message);
     }
 }
